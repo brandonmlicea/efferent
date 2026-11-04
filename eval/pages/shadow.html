@@ -1,0 +1,2 @@
+<!doctype html><title>Shadow</title><x-counter></x-counter><p id="n">0</p>
+<script>customElements.define("x-counter", class extends HTMLElement { constructor() { super(); const r = this.attachShadow({ mode: "open" }); r.innerHTML = "<button>Add one</button>"; r.querySelector("button").onclick = () => n.textContent = +n.textContent + 1; } });</script>

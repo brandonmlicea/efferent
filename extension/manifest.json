@@ -1,0 +1,13 @@
+{
+	"manifest_version": 3,
+	"name": "efferent",
+	"version": "1.0.0",
+	"description": "Lets an MCP client on this computer (Claude Code and others) use this browser, in a window of its own, without taking your keyboard or screen.",
+	"key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvlCo5YnW8gMp3d7qODQCLE1j3Himps6PeZvKKZKhhTyGlGy+/WQFALAHcWk4v4R3HLm0f6hPlF4Kpz+S+J7dJOwcWcAwnZsFByOtQmgZy1zGvDqMbo4fEjLda2YXNpW3qdpvgZMPZ7ahMWnOBLYxY0RTuAwDzQxFEstnmt06EBA7YAtsNGRFaP8y+QbITJo8rJ/ICkxrivLn8OCaaPTKXLP7xA/bxVqCCmFD6V9W534fxJjODVrUObcGHkW0IUCzgvtYio9WqO4eP5WUhl2N2V9ieITio37sFaRqN3jj6/Qy0A51y2KtITSkK2P8hS58vzBOx/XAS3ws9uazetL7YQIDAQAB",
+	"minimum_chrome_version": "120",
+	"background": { "service_worker": "background.js", "type": "module" },
+	"permissions": ["tabs", "scripting", "debugger", "alarms", "storage", "userScripts"],
+	"host_permissions": ["<all_urls>"],
+	"action": { "default_title": "efferent", "default_popup": "popup.html", "default_icon": { "16": "icon16.png", "32": "icon32.png" } },
+	"icons": { "16": "icon16.png", "32": "icon32.png", "48": "icon48.png", "128": "icon128.png" }
+}

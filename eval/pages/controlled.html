@@ -1,0 +1,9 @@
+<!doctype html><title>Controlled</title>
+<label>City <input id="city"></label><p>State: <b id="state"></b></p>
+<script>
+let value = "";
+const desc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value");
+let tracked = "";
+Object.defineProperty(city, "value", { get() { return desc.get.call(this); }, set(v) { tracked = v; desc.set.call(this, v); } });
+city.addEventListener("input", () => { const now = desc.get.call(city); if (now !== tracked) { value = now; tracked = now; state.textContent = value; } });
+</script>

@@ -1,0 +1,3 @@
+<!doctype html><title>Feed</title><ul id="list"></ul><div id="end" style="height:10px"></div>
+<script>let n = 0; const more = () => { for (let i = 0; i < 20; i++) { const li = document.createElement("li"); li.style.height = "40px"; li.textContent = `Item ${++n}`; list.append(li); } };
+more(); new IntersectionObserver((e) => { if (e[0].isIntersecting && n < 100) setTimeout(more, 150); }).observe(end);</script>

@@ -1,0 +1,147 @@
+[
+	{
+		"id": "form",
+		"shape": "A whole signup form in one call: text, email, dropdown by option text, checkbox, radio, textarea, then submit",
+		"page": "/form",
+		"act": [
+			{ "fill": "ref:Full name", "value": "Ada Lovelace" },
+			{ "fill": "ref:Email", "value": "ada@example.com" },
+			{ "fill": "ref:Plan", "value": "Team" },
+			{ "fill": "ref:I agree to the terms", "value": true },
+			{ "fill": "ref:By phone", "value": true },
+			{ "fill": "ref:Notes", "value": "Call after 5" },
+			{ "click": "Create account" }
+		],
+		"check": "(() => { const o = JSON.parse(out.textContent || '{}'); return o.name === 'Ada Lovelace' && o.email === 'ada@example.com' && o.plan === 'p2' && o.terms === 'on' && o.contact === 'phone' && o.notes === 'Call after 5'; })()"
+	},
+	{
+		"id": "controlled",
+		"shape": "A controlled input that, like React, ignores a value set through the element's own setter",
+		"page": "/controlled",
+		"act": [
+			{ "fill": "ref:City", "value": "Lisbon" }
+		],
+		"check": "state.textContent === 'Lisbon'"
+	},
+	{
+		"id": "enter",
+		"shape": "A search box with no button, submitted by Enter",
+		"page": "/enter",
+		"act": [
+			{ "fill": "ref:Search", "value": "usb c cable" },
+			{ "press": "Enter" }
+		],
+		"check": "location.pathname === '/results' && new URLSearchParams(location.search).get('q') === 'usb c cable'"
+	},
+	{
+		"id": "shadow",
+		"shape": "A button inside an open shadow root, clicked twice by its text",
+		"page": "/shadow",
+		"act": [
+			{ "click": "Add one" },
+			{ "click": "Add one" }
+		],
+		"check": "n.textContent === '2'"
+	},
+	{
+		"id": "editor",
+		"shape": "A contenteditable rich editor with a draft in it, replaced",
+		"page": "/editor",
+		"act": [
+			{ "fill": "ref:Message body", "value": "Hello there" }
+		],
+		"check": "ed.innerText.trim() === 'Hello there' && len.textContent === '11'"
+	},
+	{
+		"id": "late",
+		"shape": "A button that appears 1.2 s after load, waited for by its text",
+		"page": "/late",
+		"act": [
+			{ "wait": "Continue to checkout" },
+			{ "click": "Continue to checkout" }
+		],
+		"check": "done.textContent === 'clicked'"
+	},
+	{
+		"id": "blank",
+		"shape": "A link with target=_blank, which a synthetic click would lose to the popup blocker",
+		"page": "/blank",
+		"act": [
+			{ "click": "Open the report" }
+		],
+		"check": "location.pathname === '/landed'"
+	},
+	{
+		"id": "frame",
+		"shape": "A button inside an iframe, by its frame ref",
+		"page": "/frame",
+		"act": [
+			{ "click": "ref:Press inside the frame" }
+		],
+		"check": "document.title === 'Pressed'"
+	},
+	{
+		"id": "trusted",
+		"shape": "A button that only acts on event.isTrusted, clicked with trusted: true",
+		"page": "/trusted",
+		"act": [
+			{ "click": "Only real clicks", "trusted": true }
+		],
+		"check": "out.textContent === 'trusted'"
+	},
+	{
+		"id": "csp",
+		"shape": "eval on a page whose Content-Security-Policy forbids eval",
+		"page": "/csp",
+		"eval": "document.querySelector('#t').dataset.total",
+		"expect": "42"
+	},
+	{
+		"id": "tt",
+		"shape": "eval on a page that requires Trusted Types, where eval of a string throws",
+		"page": "/tt",
+		"eval": "document.querySelector('#t').dataset.total",
+		"expect": "42"
+	},
+	{
+		"id": "lazy",
+		"shape": "An infinite feed that loads 20 items each time its end scrolls into view",
+		"page": "/lazy",
+		"act": [
+			{ "scroll": 3000 },
+			{ "wait": 400 },
+			{ "scroll": 3000 },
+			{ "wait": "Item 60" }
+		],
+		"check": "list.children.length >= 60"
+	},
+	{
+		"id": "listbox",
+		"shape": "A custom ARIA combobox that opens on mousedown, then an option by its text",
+		"page": "/listbox",
+		"act": [
+			{ "click": "ref:Country" },
+			{ "click": "Japan" }
+		],
+		"check": "out.textContent === 'Japan'"
+	},
+	{
+		"id": "hover",
+		"shape": "A menu that only shows its link on hover",
+		"page": "/hover",
+		"act": [
+			{ "hover": "css:#m" },
+			{ "click": "Your orders" }
+		],
+		"check": "location.pathname === '/landed'"
+	},
+	{
+		"id": "keys",
+		"shape": "A keyboard shortcut (ctrl+k) the page listens for",
+		"page": "/keys",
+		"act": [
+			{ "press": "ctrl+k" }
+		],
+		"check": "!pal.hidden"
+	}
+]

@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<style>
+			:root { color-scheme: light dark; font: 13px/18px system-ui, sans-serif; }
+			body { width: 260px; margin: 0; padding: 14px; }
+			h1 { font-size: 14px; font-weight: 600; margin: 0 0 2px; }
+			p { margin: 0 0 12px; opacity: 0.7; }
+			label { display: block; margin: 10px 0 4px; font-weight: 500; }
+			input[type="text"] { box-sizing: border-box; width: 100%; padding: 6px 8px; font: inherit; border: 1px solid #8884; border-radius: 6px; background: transparent; }
+			.row { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+			small { display: block; margin-top: 12px; opacity: 0.6; }
+		</style>
+	</head>
+	<body>
+		<h1>efferent</h1>
+		<p id="state">…</p>
+		<label for="name">This browser's name</label>
+		<input id="name" type="text" spellcheck="false" />
+		<div class="row"><span>Let Claude use this browser</span><input id="on" type="checkbox" /></div>
+		<small id="counts"></small>
+		<script src="popup.js"></script>
+	</body>
+</html>

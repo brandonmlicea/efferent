@@ -1,0 +1,2 @@
+<!doctype html><title>Trusted</title><button id="b">Only real clicks</button><p id="out"></p>
+<script>b.addEventListener("click", (e) => out.textContent = e.isTrusted ? "trusted" : "ignored");</script>

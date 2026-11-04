@@ -1,0 +1,5 @@
+<!doctype html><title>Listbox</title>
+<div role="combobox" id="cb" tabindex="0" aria-expanded="false" aria-label="Country">Choose a country</div>
+<ul role="listbox" id="lb" hidden><li role="option">Canada</li><li role="option">Mexico</li><li role="option">Japan</li></ul><p id="out"></p>
+<script>cb.addEventListener("mousedown", () => { lb.hidden = false; cb.setAttribute("aria-expanded", "true"); });
+lb.addEventListener("click", (e) => { out.textContent = e.target.textContent; cb.textContent = e.target.textContent; lb.hidden = true; });</script>

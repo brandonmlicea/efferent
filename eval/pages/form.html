@@ -1,0 +1,7 @@
+<!doctype html><title>Signup</title>
+<form id="f"><label>Full name <input name="name"></label><label>Email <input name="email" type="email"></label>
+<label>Plan <select name="plan"><option value="">Pick one</option><option value="p1">Starter</option><option value="p2">Team</option><option value="p3">Business</option></select></label>
+<label><input type="checkbox" name="terms"> I agree to the terms</label>
+<fieldset><legend>Contact</legend><label><input type="radio" name="contact" value="email"> By email</label><label><input type="radio" name="contact" value="phone"> By phone</label></fieldset>
+<label>Notes <textarea name="notes"></textarea></label><button>Create account</button></form><pre id="out"></pre>
+<script>f.onsubmit = (e) => { e.preventDefault(); out.textContent = JSON.stringify(Object.fromEntries(new FormData(f))); };</script>

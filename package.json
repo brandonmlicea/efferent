@@ -1,0 +1,12 @@
+{
+	"name": "efferent",
+	"version": "1.0.0",
+	"description": "A Chrome extension and a local MCP server that let Claude use the browser it is installed in, in a window of its own, without interrupting you.",
+	"type": "module",
+	"bin": { "efferent": "src/index.js" },
+	"files": ["src", "extension"],
+	"engines": { "node": ">=20" },
+	"license": "MIT",
+	"repository": "github:brandonmlicea/efferent",
+	"keywords": ["mcp", "claude", "claude-code", "chrome-extension", "browser", "browser-automation", "chromium", "agent", "eval"]
+}
