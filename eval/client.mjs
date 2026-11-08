@@ -3,7 +3,7 @@ import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
 
 export function connect() {
-	const server = spawn(process.execPath, [fileURLToPath(new URL("../src/index.js", import.meta.url))], { stdio: ["pipe", "pipe", "inherit"] });
+	const server = spawn(process.env.EFFERENT_BIN || fileURLToPath(new URL(`../target/release/efferent${process.platform === "win32" ? ".exe" : ""}`, import.meta.url)), [], { stdio: ["pipe", "pipe", "inherit"] });
 	const waiting = new Map();
 	let seq = 0;
 	createInterface({ input: server.stdout }).on("line", (line) => {

@@ -1,0 +1,10 @@
+<!doctype html><title>Upload</title>
+<label>Attach <input type="file" multiple id="f"></label>
+<div id="zone" role="button" aria-label="Drop files here" style="width:300px;height:100px;border:2px dashed">Drop files here</div>
+<output id="out"></output>
+<script>
+const done = (files) => (out.textContent = [...files].map((x) => `${x.name}:${x.size}`).join(","));
+f.onchange = () => done(f.files);
+zone.ondragover = (e) => e.preventDefault();
+zone.ondrop = (e) => { e.preventDefault(); done(e.dataTransfer.files); };
+</script>

@@ -1,0 +1,7 @@
+<!doctype html><title>App</title>
+<button id="go">Sign in with Google</button>
+<output id="out"></output>
+<script>
+go.onclick = () => { if (!window.open("/chooser", "auth", "width=480,height=600")) out.textContent = "blocked"; };
+addEventListener("message", (e) => (out.textContent = e.data));
+</script>

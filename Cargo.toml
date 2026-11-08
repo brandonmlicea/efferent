@@ -1,0 +1,19 @@
+[package]
+name = "efferent"
+version = "2.0.0"
+edition = "2021"
+description = "Claude in your own browser"
+license = "MIT"
+repository = "https://github.com/brandonmlicea/efferent"
+include = ["src/**", "extension/**", "Cargo.toml", "README.md", "LICENSE", ]
+
+[dependencies]
+base64 = "0.22"
+serde_json = "1"
+tungstenite = { version = "0.24", default-features = false, features = ["handshake"] }
+
+[profile.release]
+opt-level = "s"
+lto = true
+strip = true
+panic = "abort"

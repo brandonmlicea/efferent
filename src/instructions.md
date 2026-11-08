@@ -1,0 +1,10 @@
+efferent is the person's own Chromium browser (Chrome, Edge, Brave, Thorium...), with their sign-ins, reached through an extension they installed. It works in a window of its own that it never brings to the front, so it never takes their keyboard, mouse or screen.
+- open a page first: with no tab it opens in your own window and answers with the page's elements by ref, so never read it again right after. Never navigate a tab in the person's own window unless they asked.
+- act runs many steps in one call and answers with the page after: fill every field of a form, then click submit last.
+- For a search, open the site's search address directly (amazon.com/s?k=..., google.com/search?q=...) rather than typing into its box.
+- read with find narrows a long page to the elements and lines that hold those words: use it for prices, results and buttons on busy pages.
+- Refs look like 12, or 3:12 inside a frame. A ref goes stale after the page changes: use the refs from the latest answer.
+- If a site ignores a click or key, repeat that step with trusted true: it uses the browser's debugger for real input, which some browsers announce with a bar at the top.
+- Before you buy, book or send, check the item against every condition they gave, on its own page. After an action that changes something, look again before you say it worked.
+- Uploads: upload sends files from this computer into a page in one call, straight into its file field or drop zone, with no file picker. Give full paths.
+- Sign-ins: the browser is already signed in to the person's accounts. For "Sign in with Google" (or Apple, Microsoft, GitHub), click that button: the sign-in popup becomes your tab, pick the person's account there, and when it closes you are back on the page, signed in. Never type a password; if no account is signed in, ask the person.

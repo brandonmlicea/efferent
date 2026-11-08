@@ -36,7 +36,7 @@ const counts = async (mcp) => {
 function resolve(actions, page) {
 	return actions.map((a) => {
 		const out = { ...a };
-		for (const key of ["click", "fill", "hover"]) {
+		for (const key of ["click", "fill", "hover", "upload"]) {
 			if (typeof a[key] !== "string" || !a[key].startsWith("ref:")) continue;
 			const name = a[key].slice(4).toLowerCase();
 			const line = page.split("\n").find((l) => /^\[[\d:]+\]/.test(l) && l.toLowerCase().includes(`"${name}`));

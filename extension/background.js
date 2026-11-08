@@ -3,6 +3,10 @@ const sockets = new Map();
 const stats = { calls: 0, focusChanges: 0, userTabSwitches: 0, debuggerAttaches: 0 };
 let busy = 0;
 let raising = false;
+let personWindow = null;
+const spawned = new Map();
+const popups = new Set();
+const SIGNIN = /^https:\/\/(accounts\.google\.com|appleid\.apple\.com|login\.microsoftonline\.com|login\.live\.com)\//;
 
 const sleep = (ms) => new Promise((done) => setTimeout(done, ms));
 const local = chrome.storage.local;
@@ -61,6 +65,8 @@ async function fronts() {
 async function answer(ws, { id, method, params }) {
 	if (!id) return;
 	const before = await fronts();
+	const front = await chrome.windows.getLastFocused().catch(() => null);
+	if (front?.focused && front.id !== (await mine())) personWindow = front.id;
 	busy++;
 	stats.calls++;
 	badge();
@@ -208,8 +214,19 @@ async function keys(send, combo) {
 	await send("Input.dispatchKeyEvent", { type: "keyUp", key, windowsVirtualKeyCode: code, modifiers });
 }
 
+async function signin(tab, click) {
+	const { frame, target } = aim(click);
+	if (frame) return /^https:\/\/accounts\.google\.com\//.test((await chrome.webNavigation.getFrame({ tabId: tab, frameId: frame }).catch(() => null))?.url ?? "");
+	return call(tab, 0, "signin", target).catch(() => false);
+}
+
 async function step(state, a, trusted) {
 	const tab = state.tab;
+	trusted ||= a.click != null && (SIGNIN.test((await chrome.tabs.get(tab)).url ?? "") || (await signin(tab, a.click)));
+	if (a.upload != null) {
+		const { frame, target } = a.upload === "" ? { frame: 0, target: null } : aim(a.upload);
+		return (await call(tab, frame, "upload", target, a.files)).said;
+	}
 	if (a.go) return void (await chrome.tabs.update(tab, { url: address(a.go) }));
 	if (a.back) return void (await chrome.tabs.goBack(tab));
 	if (a.forward) return void (await chrome.tabs.goForward(tab));
@@ -231,7 +248,15 @@ async function step(state, a, trusted) {
 		const d = await state.debugger();
 		if (a.type != null) return void (await d.send("Input.insertText", { text: String(a.type) }));
 		if (a.press != null) return void (await keys(d.send, a.press));
-		const { x, y, said } = await call(tab, 0, "point", aim(a.click).target);
+		const { frame, target } = aim(a.click);
+		let { x, y, said } = await call(tab, frame, "point", target);
+		for (let f = frame; f; ) {
+			const info = await chrome.webNavigation.getFrame({ tabId: tab, frameId: f });
+			const at = await call(tab, info.parentFrameId, "frameAt", info.url);
+			x += at.x;
+			y += at.y;
+			f = info.parentFrameId;
+		}
 		for (const type of ["mouseMoved", "mousePressed", "mouseReleased"]) await d.send("Input.dispatchMouseEvent", { type, x, y, button: "left", clickCount: 1 });
 		return `clicked ${said} (trusted)`;
 	}
@@ -240,6 +265,7 @@ async function step(state, a, trusted) {
 		const r = await call(tab, frame, "click", target);
 		if (!r.open) return r.said;
 		const t = await backTab((await chrome.tabs.get(tab)).windowId, r.open, tab);
+		spawned.delete(tab);
 		state.tab = t.id;
 		return `the link opens a new tab: now in tab ${t.id}`;
 	}
@@ -297,7 +323,7 @@ const METHODS = {
 	status: async () => ({ ...(await me()), ...stats, agentWindow: await mine(), paused: !!(await local.get("paused")).paused }),
 	tabs: async () => {
 		const [tabs, front, own] = await Promise.all([chrome.tabs.query({}), chrome.windows.getLastFocused().catch(() => null), mine()]);
-		return tabs.map((t) => ({ id: t.id, window: t.windowId, title: t.title, url: t.url, active: t.active, mine: t.windowId === own, front: t.active && t.windowId === front?.id && t.windowId !== own }));
+		return tabs.map((t) => ({ id: t.id, window: t.windowId, title: t.title, url: t.url, active: t.active, mine: t.windowId === own, popup: popups.has(t.id), front: t.active && t.windowId === front?.id && t.windowId !== own }));
 	},
 	open: async ({ url, tab, show }) => {
 		const t = tab ? await chrome.tabs.update(tab, { url: address(url) }) : await newTab(address(url), show);
@@ -307,10 +333,33 @@ const METHODS = {
 	read: async ({ tab, find, text, max }) => ({ tab, text: await look(tab, { find, text, max }) }),
 	act: async ({ tab, actions, trusted }) => {
 		const state = { tab, attached: null };
-		state.debugger = async () => (state.attached ??= await debug(state.tab));
+		state.debugger = async () => {
+			if (state.attached?.tab !== state.tab) {
+				await state.attached?.done();
+				state.attached = { ...(await debug(state.tab)), tab: state.tab };
+			}
+			return state.attached;
+		};
 		const log = [];
+		const back = [];
+		const follow = async () => {
+			const kid = spawned.get(state.tab)?.pop();
+			if (kid != null && (await chrome.tabs.get(kid).catch(() => null))) {
+				back.push(state.tab);
+				state.tab = kid;
+				await settle(kid);
+				const t = await chrome.tabs.get(kid);
+				log.push(`a ${popups.has(kid) ? "popup" : "new tab"} opened (${new URL(t.url || t.pendingUrl || "about:blank").host}): the next steps run in tab ${kid}, and you return to tab ${back.at(-1)} when it closes`);
+			}
+			while (back.length && !(await chrome.tabs.get(state.tab).catch(() => null))) {
+				state.tab = back.pop();
+				await settle(state.tab);
+				log.push(`the popup closed: back in tab ${state.tab}`);
+			}
+		};
 		try {
 			for (const a of actions) {
+				await follow();
 				try {
 					const said = await step(state, a, trusted || a.trusted);
 					log.push(`ok ${JSON.stringify(a)}${said ? `: ${said}` : ""}`);
@@ -320,6 +369,7 @@ const METHODS = {
 				}
 				await settle(state.tab);
 			}
+			await follow();
 		} finally {
 			await state.attached?.done();
 		}
@@ -356,8 +406,33 @@ const METHODS = {
 	},
 };
 
-chrome.windows.onFocusChanged.addListener((id) => {
-	if (busy && !raising && id !== chrome.windows.WINDOW_ID_NONE) stats.focusChanges++;
+chrome.windows.onFocusChanged.addListener(async (id) => {
+	if (id === chrome.windows.WINDOW_ID_NONE || raising) return;
+	const popup = (await chrome.tabs.query({ windowId: id })).some((t) => popups.has(t.id));
+	if (popup && personWindow != null) {
+		raising = true;
+		await chrome.windows.update(personWindow, { focused: true }).catch(() => undefined);
+		setTimeout(() => (raising = false), 300);
+		return;
+	}
+	if (busy) stats.focusChanges++;
+	if (id !== (await mine())) personWindow = id;
+});
+chrome.webNavigation.onCreatedNavigationTarget.addListener(async ({ sourceTabId, tabId }) => {
+	if (!busy) return;
+	const [own, opener, t] = await Promise.all([mine(), chrome.tabs.get(sourceTabId).catch(() => null), chrome.tabs.get(tabId).catch(() => null)]);
+	if (!opener || !t || (opener.windowId !== own && !popups.has(opener.id))) return;
+	if (t.windowId !== own) popups.add(tabId);
+	spawned.set(sourceTabId, [...(spawned.get(sourceTabId) ?? []), tabId]);
+	if (popups.has(tabId) && personWindow != null) {
+		raising = true;
+		await chrome.windows.update(personWindow, { focused: true }).catch(() => undefined);
+		setTimeout(() => (raising = false), 300);
+	}
+});
+chrome.tabs.onRemoved.addListener((id) => {
+	popups.delete(id);
+	spawned.delete(id);
 });
 chrome.storage.onChanged.addListener(async (change) => {
 	if (change.name) for (const ws of open()) ws.send(JSON.stringify({ hello: await me() }));

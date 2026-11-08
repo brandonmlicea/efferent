@@ -1,0 +1,6 @@
+<!doctype html><title>Choose an account</title>
+<h1>Choose an account</h1>
+<div role="link" tabindex="0" id="ada">Ada Lovelace ada@example.com</div>
+<script>
+ada.onclick = () => { opener.postMessage("signed in as ada", "*"); setTimeout(() => close(), 50); };
+</script>

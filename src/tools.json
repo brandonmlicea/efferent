@@ -1,0 +1,201 @@
+[
+	{
+		"name": "browsers",
+		"description": "The browsers connected through the efferent extension, with their names, and what each has done this session. reload true reloads the extension in one browser after its files were edited.",
+		"inputSchema": {
+			"type": "object",
+			"properties": {
+				"reload": {
+					"type": "boolean"
+				},
+				"browser": {
+					"type": "string",
+					"description": "Which connected browser, by its name in browsers. Defaults to the first one connected."
+				}
+			}
+		}
+	},
+	{
+		"name": "tabs",
+		"description": "Every tab in a browser: yours (in your own window) and the person's, marking the one they used last. Sign-in popups are marked.",
+		"inputSchema": {
+			"type": "object",
+			"properties": {
+				"browser": {
+					"type": "string",
+					"description": "Which connected browser, by its name in browsers. Defaults to the first one connected."
+				}
+			}
+		}
+	},
+	{
+		"name": "open",
+		"description": "Open an address. With no tab it opens in a new tab of your own window, which stays behind the person's windows (show true brings it to the front instead); with tab it navigates that tab. Answers with the page's elements by ref.",
+		"inputSchema": {
+			"type": "object",
+			"properties": {
+				"url": {
+					"type": "string"
+				},
+				"tab": {
+					"type": "number",
+					"description": "Tab id. Defaults to the last tab you opened or used in that browser."
+				},
+				"show": {
+					"type": "boolean"
+				},
+				"browser": {
+					"type": "string",
+					"description": "Which connected browser, by its name in browsers. Defaults to the first one connected."
+				}
+			},
+			"required": [
+				"url"
+			]
+		}
+	},
+	{
+		"name": "read",
+		"description": "A tab's title, address and interactive elements by ref. find keeps only the elements and text lines (with the lines around them) holding every one of its words, with | between alternatives ('out of 5 stars | Add to cart'); text true adds the page's words.",
+		"inputSchema": {
+			"type": "object",
+			"properties": {
+				"tab": {
+					"type": "number",
+					"description": "Tab id. Defaults to the last tab you opened or used in that browser."
+				},
+				"find": {
+					"type": "string"
+				},
+				"text": {
+					"type": "boolean"
+				},
+				"max": {
+					"type": "number",
+					"description": "Most elements to list, 150 by default."
+				},
+				"browser": {
+					"type": "string",
+					"description": "Which connected browser, by its name in browsers. Defaults to the first one connected."
+				}
+			}
+		}
+	},
+	{
+		"name": "act",
+		"description": "Run steps in a tab in order, waiting for the page to settle after each, and answer with what ran and the page after. Steps: {click: ref or visible text}, {fill: ref, value} (text box, dropdown by option text, checkbox true/false, rich editor), {type: text} (into the focused field), {press: \"Enter\" | \"ctrl+a\" | \"Escape\"}, {hover: ref}, {scroll: pixels or ref}, {go: address}, {back: true}, {forward: true}, {reload: true}, {upload: ref of a file field or drop zone (or empty for the page's first), files: [paths]}, {wait: ms or \"text to wait for\"}. A target can also be \"css:selector\". Add trusted: true to a click, type or press (or to the whole call) for real input through the debugger. When a step opens a popup or new tab (Sign in with Google), the next steps run there, and you return to the page when it closes.",
+		"inputSchema": {
+			"type": "object",
+			"properties": {
+				"tab": {
+					"type": "number",
+					"description": "Tab id. Defaults to the last tab you opened or used in that browser."
+				},
+				"actions": {
+					"type": "array",
+					"items": {
+						"type": "object"
+					},
+					"maxItems": 40
+				},
+				"trusted": {
+					"type": "boolean"
+				},
+				"browser": {
+					"type": "string",
+					"description": "Which connected browser, by its name in browsers. Defaults to the first one connected."
+				}
+			},
+			"required": [
+				"actions"
+			]
+		}
+	},
+	{
+		"name": "upload",
+		"description": "Put files from this computer into a page: a file field, or a drop zone, by ref or visible text; with no to, the page's first file field. Fast: no file picker opens. Up to 64 MB a file.",
+		"inputSchema": {
+			"type": "object",
+			"properties": {
+				"files": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"description": "Full paths on this computer."
+				},
+				"to": {
+					"type": "string"
+				},
+				"tab": {
+					"type": "number",
+					"description": "Tab id. Defaults to the last tab you opened or used in that browser."
+				},
+				"browser": {
+					"type": "string",
+					"description": "Which connected browser, by its name in browsers. Defaults to the first one connected."
+				}
+			},
+			"required": [
+				"files"
+			]
+		}
+	},
+	{
+		"name": "screenshot",
+		"description": "A picture of a tab. Slower than read: use it for layout, images and charts.",
+		"inputSchema": {
+			"type": "object",
+			"properties": {
+				"tab": {
+					"type": "number",
+					"description": "Tab id. Defaults to the last tab you opened or used in that browser."
+				},
+				"browser": {
+					"type": "string",
+					"description": "Which connected browser, by its name in browsers. Defaults to the first one connected."
+				}
+			}
+		}
+	},
+	{
+		"name": "eval",
+		"description": "Run JavaScript in a tab and answer its value (JSON for objects). An expression, or statements whose last value is the answer; wrap await in an async function.",
+		"inputSchema": {
+			"type": "object",
+			"properties": {
+				"js": {
+					"type": "string"
+				},
+				"tab": {
+					"type": "number",
+					"description": "Tab id. Defaults to the last tab you opened or used in that browser."
+				},
+				"browser": {
+					"type": "string",
+					"description": "Which connected browser, by its name in browsers. Defaults to the first one connected."
+				}
+			},
+			"required": [
+				"js"
+			]
+		}
+	},
+	{
+		"name": "close",
+		"description": "Close a tab.",
+		"inputSchema": {
+			"type": "object",
+			"properties": {
+				"tab": {
+					"type": "number",
+					"description": "Tab id. Defaults to the last tab you opened or used in that browser."
+				},
+				"browser": {
+					"type": "string",
+					"description": "Which connected browser, by its name in browsers. Defaults to the first one connected."
+				}
+			}
+		}
+	}
+]

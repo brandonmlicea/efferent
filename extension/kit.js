@@ -177,6 +177,26 @@
 			el.click();
 			return { said: `clicked ${line(el)}` };
 		},
+		upload(t, files) {
+			if (!Array.isArray(files)) throw new Error("upload needs files: paths on this computer.");
+			const list = files.map((f) => new File([Uint8Array.from(atob(f.data), (c) => c.charCodeAt(0))], f.name, { type: f.type }));
+			const dt = new DataTransfer();
+			for (const f of list) dt.items.add(f);
+			const inputs = [...walk(document)].filter((e) => e instanceof HTMLInputElement && e.type === "file");
+			const el = t ? element(t) : inputs[0];
+			if (!el) throw new Error("This page has no file field: give the ref of its drop zone or upload button.");
+			const input = el instanceof HTMLInputElement && el.type === "file" ? el : el.querySelector?.("input[type=file]") || el.closest("label")?.querySelector("input[type=file]") || (el.htmlFor && document.getElementById(el.htmlFor));
+			const names = list.map((f) => f.name).join(", ");
+			if (input) {
+				input.files = input.multiple ? dt.files : (() => { const one = new DataTransfer(); one.items.add(list[0]); return one.files; })();
+				fire(input, "input");
+				fire(input, "change");
+				return { said: `uploaded ${input.multiple ? names : list[0].name} into ${line(input)}` };
+			}
+			const at = center(el);
+			for (const type of ["dragenter", "dragover", "drop"]) el.dispatchEvent(new DragEvent(type, { bubbles: true, cancelable: true, composed: true, clientX: at.x, clientY: at.y, dataTransfer: dt }));
+			return { said: `dropped ${names} on ${line(el)}` };
+		},
 		hover(t) {
 			const el = element(t);
 			press(el, { ...center(el), types: ["pointerover", "pointerenter", "mouseover", "mouseenter", "pointermove", "mousemove"] });
@@ -213,7 +233,7 @@
 				}
 				return { said: `filled ${line(el)}` };
 			}
-			if (el.type === "file") throw new Error("A file field needs a file the person picks.");
+			if (el.type === "file") return this.upload(t, value);
 			setValue(el, text);
 			el.dispatchEvent(new InputEvent("input", { bubbles: true, composed: true, inputType: "insertText", data: text }));
 			fire(el, "change");
@@ -268,10 +288,16 @@
 			return { said: `scrolled to ${Math.round(scrollY)}` };
 		},
 		point(t) {
-			if (window !== top) throw new Error("Trusted steps work on the main frame only.");
 			const el = element(t);
 			return { ...center(el), said: line(el) };
 		},
+		frameAt(url) {
+			const f = [...walk(document)].find((e) => e instanceof HTMLIFrameElement && (e.src === url || url.startsWith(e.src)));
+			if (!f) throw new Error("Cannot place that frame for a trusted click.");
+			const r = f.getBoundingClientRect();
+			return { x: r.left + f.clientLeft, y: r.top + f.clientTop };
+		},
+		signin: (t) => /\b(sign|log) ?(in|up) with|continue with (google|apple|microsoft|github)|^(google|apple|microsoft|github)$/i.test(name(element(t))),
 		has: (text) => (document.body?.innerText || "").toLowerCase().includes(String(text).toLowerCase()),
 		async quiet(gap, max) {
 			let last = Date.now();

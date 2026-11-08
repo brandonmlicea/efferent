@@ -4,13 +4,33 @@
 		"shape": "A whole signup form in one call: text, email, dropdown by option text, checkbox, radio, textarea, then submit",
 		"page": "/form",
 		"act": [
-			{ "fill": "ref:Full name", "value": "Ada Lovelace" },
-			{ "fill": "ref:Email", "value": "ada@example.com" },
-			{ "fill": "ref:Plan", "value": "Team" },
-			{ "fill": "ref:I agree to the terms", "value": true },
-			{ "fill": "ref:By phone", "value": true },
-			{ "fill": "ref:Notes", "value": "Call after 5" },
-			{ "click": "Create account" }
+			{
+				"fill": "ref:Full name",
+				"value": "Ada Lovelace"
+			},
+			{
+				"fill": "ref:Email",
+				"value": "ada@example.com"
+			},
+			{
+				"fill": "ref:Plan",
+				"value": "Team"
+			},
+			{
+				"fill": "ref:I agree to the terms",
+				"value": true
+			},
+			{
+				"fill": "ref:By phone",
+				"value": true
+			},
+			{
+				"fill": "ref:Notes",
+				"value": "Call after 5"
+			},
+			{
+				"click": "Create account"
+			}
 		],
 		"check": "(() => { const o = JSON.parse(out.textContent || '{}'); return o.name === 'Ada Lovelace' && o.email === 'ada@example.com' && o.plan === 'p2' && o.terms === 'on' && o.contact === 'phone' && o.notes === 'Call after 5'; })()"
 	},
@@ -19,7 +39,10 @@
 		"shape": "A controlled input that, like React, ignores a value set through the element's own setter",
 		"page": "/controlled",
 		"act": [
-			{ "fill": "ref:City", "value": "Lisbon" }
+			{
+				"fill": "ref:City",
+				"value": "Lisbon"
+			}
 		],
 		"check": "state.textContent === 'Lisbon'"
 	},
@@ -28,8 +51,13 @@
 		"shape": "A search box with no button, submitted by Enter",
 		"page": "/enter",
 		"act": [
-			{ "fill": "ref:Search", "value": "usb c cable" },
-			{ "press": "Enter" }
+			{
+				"fill": "ref:Search",
+				"value": "usb c cable"
+			},
+			{
+				"press": "Enter"
+			}
 		],
 		"check": "location.pathname === '/results' && new URLSearchParams(location.search).get('q') === 'usb c cable'"
 	},
@@ -38,8 +66,12 @@
 		"shape": "A button inside an open shadow root, clicked twice by its text",
 		"page": "/shadow",
 		"act": [
-			{ "click": "Add one" },
-			{ "click": "Add one" }
+			{
+				"click": "Add one"
+			},
+			{
+				"click": "Add one"
+			}
 		],
 		"check": "n.textContent === '2'"
 	},
@@ -48,7 +80,10 @@
 		"shape": "A contenteditable rich editor with a draft in it, replaced",
 		"page": "/editor",
 		"act": [
-			{ "fill": "ref:Message body", "value": "Hello there" }
+			{
+				"fill": "ref:Message body",
+				"value": "Hello there"
+			}
 		],
 		"check": "ed.innerText.trim() === 'Hello there' && len.textContent === '11'"
 	},
@@ -57,8 +92,12 @@
 		"shape": "A button that appears 1.2 s after load, waited for by its text",
 		"page": "/late",
 		"act": [
-			{ "wait": "Continue to checkout" },
-			{ "click": "Continue to checkout" }
+			{
+				"wait": "Continue to checkout"
+			},
+			{
+				"click": "Continue to checkout"
+			}
 		],
 		"check": "done.textContent === 'clicked'"
 	},
@@ -67,7 +106,9 @@
 		"shape": "A link with target=_blank, which a synthetic click would lose to the popup blocker",
 		"page": "/blank",
 		"act": [
-			{ "click": "Open the report" }
+			{
+				"click": "Open the report"
+			}
 		],
 		"check": "location.pathname === '/landed'"
 	},
@@ -76,7 +117,9 @@
 		"shape": "A button inside an iframe, by its frame ref",
 		"page": "/frame",
 		"act": [
-			{ "click": "ref:Press inside the frame" }
+			{
+				"click": "ref:Press inside the frame"
+			}
 		],
 		"check": "document.title === 'Pressed'"
 	},
@@ -85,7 +128,10 @@
 		"shape": "A button that only acts on event.isTrusted, clicked with trusted: true",
 		"page": "/trusted",
 		"act": [
-			{ "click": "Only real clicks", "trusted": true }
+			{
+				"click": "Only real clicks",
+				"trusted": true
+			}
 		],
 		"check": "out.textContent === 'trusted'"
 	},
@@ -108,10 +154,18 @@
 		"shape": "An infinite feed that loads 20 items each time its end scrolls into view",
 		"page": "/lazy",
 		"act": [
-			{ "scroll": 3000 },
-			{ "wait": 400 },
-			{ "scroll": 3000 },
-			{ "wait": "Item 60" }
+			{
+				"scroll": 3000
+			},
+			{
+				"wait": 400
+			},
+			{
+				"scroll": 3000
+			},
+			{
+				"wait": "Item 60"
+			}
 		],
 		"check": "list.children.length >= 60"
 	},
@@ -120,8 +174,12 @@
 		"shape": "A custom ARIA combobox that opens on mousedown, then an option by its text",
 		"page": "/listbox",
 		"act": [
-			{ "click": "ref:Country" },
-			{ "click": "Japan" }
+			{
+				"click": "ref:Country"
+			},
+			{
+				"click": "Japan"
+			}
 		],
 		"check": "out.textContent === 'Japan'"
 	},
@@ -130,8 +188,12 @@
 		"shape": "A menu that only shows its link on hover",
 		"page": "/hover",
 		"act": [
-			{ "hover": "css:#m" },
-			{ "click": "Your orders" }
+			{
+				"hover": "css:#m"
+			},
+			{
+				"click": "Your orders"
+			}
 		],
 		"check": "location.pathname === '/landed'"
 	},
@@ -140,8 +202,53 @@
 		"shape": "A keyboard shortcut (ctrl+k) the page listens for",
 		"page": "/keys",
 		"act": [
-			{ "press": "ctrl+k" }
+			{
+				"press": "ctrl+k"
+			}
 		],
 		"check": "!pal.hidden"
+	},
+	{
+		"id": "upload",
+		"shape": "Files from disk into a multiple file field, no picker",
+		"page": "/upload",
+		"act": [
+			{
+				"upload": "ref:Attach",
+				"files": [
+					"eval/pages/blank.html",
+					"eval/pages/form.html"
+				]
+			}
+		],
+		"check": "out.textContent.startsWith('blank.html:') && out.textContent.includes('form.html:')"
+	},
+	{
+		"id": "drop",
+		"shape": "A file dropped on a drop zone that has no file field",
+		"page": "/upload",
+		"act": [
+			{
+				"upload": "ref:Drop files here",
+				"files": [
+					"eval/pages/blank.html"
+				]
+			}
+		],
+		"check": "out.textContent.startsWith('blank.html:')"
+	},
+	{
+		"id": "oauth",
+		"shape": "Sign in with Google: a window.open popup the blocker drops on a synthetic click, an account chooser in it, and back to the page when it closes",
+		"page": "/oauth",
+		"act": [
+			{
+				"click": "Sign in with Google"
+			},
+			{
+				"click": "Ada Lovelace"
+			}
+		],
+		"check": "out.textContent === 'signed in as ada'"
 	}
 ]
